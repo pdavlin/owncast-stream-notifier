@@ -22,10 +22,10 @@ async function handler(req: Request): Promise<Response> {
         "https://stream.davlin.io is online streaming: " + streamTitle;
       if (["zrl", "zwift"].includes(streamTitle.split(" ")[0].toLowerCase())) {
         slackPost(message, "fitness");
+        discordPost(message);
       } else {
         slackPost(message, "gaming");
       }
-      // discordPost(message);
       return new Response(null, {
         status: 204,
       });
