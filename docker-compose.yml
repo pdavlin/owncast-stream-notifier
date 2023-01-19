@@ -1,0 +1,17 @@
+version: "3.4"
+services:
+  app:
+    image: stream-notifier:latest
+    restart: unless-stopped
+    networks:
+      - traefik_public
+    labels:
+      - "traefik.http.routers.streamnotifier.rule=Host(`api.davlin.io`) && Method(`GET`, `POST`) && PathPrefix(`/v1/stream-notifier`)"
+      - "traefik.docker.network=traefik_public"
+      - "traefik.http.services.streamnotifier.loadbalancer.server.port=80"
+      - "traefik.http.routers.streamnotifier.entrypoints=https"
+      - "traefik.http.routers.streamnotifier.tls=true"
+
+networks:
+  traefik_public:
+    external: true
