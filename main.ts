@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.147.0/http/server.ts";
 import { load } from "https://deno.land/std/dotenv/mod.ts";
 import { OwncastWebhook } from "./owncast-webhooks.ts";
+import { containsAnyWord } from "./utils.ts";
 
 const configData = await load();
 const SLACK_WEBHOOK_ID = configData["SLACK_WEBHOOK_ID"];
@@ -20,7 +21,21 @@ async function handler(req: Request): Promise<Response> {
       const streamTitle: string = owncastHook.eventData.streamTitle;
       const message =
         "https://stream.davlin.io is online streaming: " + streamTitle;
-      if (["zrl", "zwift"].includes(streamTitle.split(" ")[0].toLowerCase())) {
+      if (
+        containsAnyWord(streamTitle.toLowerCase(), [
+          "test",
+          "testing",
+        ])
+      ) {
+        return new Response(null, {
+          status: 204,
+        });
+      } else if (
+        containsAnyWord(streamTitle.toLowerCase(), [
+          "zwift",
+          "zrl",
+        ])
+      ) {
         slackPost(message, "fitness");
         discordPost(message);
       } else {
@@ -72,10 +87,7 @@ function discordPost(message: string) {
     }),
   };
 
-  fetch(
-    `https://discord.com/api/webhooks/${DISCORD_CHANNEL_ID}`,
-    config
-  );
+  fetch(`https://discord.com/api/webhooks/${DISCORD_CHANNEL_ID}`, config);
 }
 
 /**
